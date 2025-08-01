@@ -45,24 +45,13 @@ android {
 }
 
 dependencies {
-    // 使用统一版本的 Kotlin 库
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.10'
+    // 只使用本地库文件
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
     
+    // 其他标准依赖
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
-    
-    // Termux 库 - 排除冲突的 Kotlin 依赖
-    implementation('com.termux:terminal-view:0.114') {
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
-    }
-    implementation('com.termux:terminal-emulator:0.114') {
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
-    }
     
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
