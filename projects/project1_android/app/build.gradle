@@ -46,7 +46,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     
-    // 使用JCenter仓库中的Termux库
+    // 使用 Maven Central 的 Termux 库
     implementation 'com.termux:terminal-view:0.118.0'
     implementation 'com.termux:terminal-emulator:0.118.0'
     
