@@ -7,30 +7,41 @@
 #include <queue>
 #include <condition_variable>
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#define printf(...) __android_log_print(ANDROID_LOG_DEBUG, "Uniball", __VA_ARGS__)
+#else
+#include <cstdio>
+#endif
+
 using namespace std;
 
-// È«¾Ö±äÁ¿
+// å…¨å±€å˜é‡
 mutex input_mutex;
 condition_variable input_cv;
 queue<string> input_queue;
 bool game_running = true;
 
-// Êä³ö»Øµ÷º¯ÊıÖ¸Õë
+void android_print(const string& msg) {
+    printf("%s", msg.c_str());
+}
+
+// è¾“å‡ºå›è°ƒå‡½æ•°æŒ‡é’ˆ
 void (*output_callback)(const char*) = nullptr;
 
-// Ìæ»» Windows Sleep
+// æ›¿æ¢ Windows Sleep
 void Sleep(int ms) {
     this_thread::sleep_for(chrono::milliseconds(ms));
 }
 
-// ×Ô¶¨ÒåÊä³öº¯Êı
+// è‡ªå®šä¹‰è¾“å‡ºå‡½æ•°
 void android_print(const string& msg) {
     if (output_callback) {
         output_callback(msg.c_str());
     }
 }
 
-// ÖØ¶¨Ïò cout
+// é‡å®šå‘ cout
 class AndroidStream : public streambuf {
 public:
     virtual streamsize xsputn(const char_type* s, streamsize n) override {
@@ -48,39 +59,39 @@ public:
     }
 };
 
-// ÓÎÏ·Ö÷Âß¼­
+// æ¸¸æˆä¸»é€»è¾‘
 void gameMain() {
-    // ³õÊ¼»¯Ëæ»úÊıÉú³ÉÆ÷
+    // åˆå§‹åŒ–éšæœºæ•°ç”Ÿæˆå™¨
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<int> dist(1, 2);
 
-    // ÓÎÏ·×´Ì¬±äÁ¿
+    // æ¸¸æˆçŠ¶æ€å˜é‡
     bool LeftHandWin = false;
     bool RightHandWin = false;
     bool LeftHandWin2 = false;
     bool RightHandWin2 = false;
 
-    android_print("ÓÎÏ·¿ªÊ¼\n");
+    android_print("æ¸¸æˆå¼€å§‹\n");
 
-    // ³õÊ¼»¯×óÓÒÊÖ
+    // åˆå§‹åŒ–å·¦å³æ‰‹
     short LeftNum = 1, RightNum = 1;
-    android_print("ÕâÊÇÄãµÄÁ½¸öÊÖ£¬×ó¡¢ÓÒÊÖ´ËÊ±¶¼ÊÇ1\n");
-    android_print("×ó£º1 ÓÒ£º1\n");
+    android_print("è¿™æ˜¯ä½ çš„ä¸¤ä¸ªæ‰‹ï¼Œå·¦ã€å³æ‰‹æ­¤æ—¶éƒ½æ˜¯1\n");
+    android_print("å·¦ï¼š1 å³ï¼š1\n");
 
     short LeftNum2 = 1, RightNum2 = 1;
-    android_print("ÕâÊÇÄãµÄ¶ÔÊÖ£¨ÈõÖÇai£©µÄ×ó¡¢ÓÒÊÖ\n");
-    android_print("×ó£º1 ÓÒ£º1\n");
+    android_print("è¿™æ˜¯ä½ çš„å¯¹æ‰‹ï¼ˆå¼±æ™ºaiï¼‰çš„å·¦ã€å³æ‰‹\n");
+    android_print("å·¦ï¼š1 å³ï¼š1\n");
 
-    // Ñ¡Ôñ×Ô¼º³öµÄÊÖ
+    // é€‰æ‹©è‡ªå·±å‡ºçš„æ‰‹
     while (game_running) {
-        android_print("Ñ¡ÔñÄãµÄÒ»Ö»ÊÖ£¨ÊäÈëL»òR£©\n");
+        android_print("é€‰æ‹©ä½ çš„ä¸€åªæ‰‹ï¼ˆè¾“å…¥Læˆ–Rï¼‰\n");
 
         bool ChooseLeftHand = false;
         bool ChooseRightHand = false;
         char Choice;
 
-        // »ñÈ¡ÓÃ»§ÊäÈë
+        // è·å–ç”¨æˆ·è¾“å…¥
         string user_input;
         {
             unique_lock<mutex> lock(input_mutex);
@@ -100,39 +111,39 @@ void gameMain() {
         case 'L': {
             if (!LeftHandWin) {
                 ChooseLeftHand = true;
-                android_print("ÄãÑ¡ÔñÁË×óÊÖ£¨" + to_string(LeftNum) + ")\n");
+                android_print("ä½ é€‰æ‹©äº†å·¦æ‰‹ï¼ˆ" + to_string(LeftNum) + ")\n");
             }
             else {
-                android_print("ÕâÖ»ÊÖÒÑ¾­Ó®ÁËÄó£¬°ïÄãÑ¡ÓÒÊÖÁË\n");
+                android_print("è¿™åªæ‰‹å·²ç»èµ¢äº†æï¼Œå¸®ä½ é€‰å³æ‰‹äº†\n");
                 Sleep(500);
                 ChooseRightHand = true;
-                android_print("ÄãÑ¡ÔñÁËÓÒÊÖ£¨" + to_string(RightNum) + "£©\n");
+                android_print("ä½ é€‰æ‹©äº†å³æ‰‹ï¼ˆ" + to_string(RightNum) + "ï¼‰\n");
             }
             break;
         }
         case 'R': {
             if (!RightHandWin) {
                 ChooseRightHand = true;
-                android_print("ÄãÑ¡ÔñÁËÓÒÊÖ£¨" + to_string(RightNum) + "£©\n");
+                android_print("ä½ é€‰æ‹©äº†å³æ‰‹ï¼ˆ" + to_string(RightNum) + "ï¼‰\n");
             }
             else {
-                android_print("ÕâÖ»ÊÖÒÑ¾­Ó®ÁËÄó£¬°ïÄãÑ¡×óÊÖÁË\n");
+                android_print("è¿™åªæ‰‹å·²ç»èµ¢äº†æï¼Œå¸®ä½ é€‰å·¦æ‰‹äº†\n");
                 Sleep(500);
                 ChooseLeftHand = true;
-                android_print("ÄãÑ¡ÔñÁË×óÊÖ£¨" + to_string(LeftNum) + "£©\n");
+                android_print("ä½ é€‰æ‹©äº†å·¦æ‰‹ï¼ˆ" + to_string(LeftNum) + "ï¼‰\n");
             }
             break;
         }
         default: {
-            android_print("ÎŞĞ§ÊäÈë£¬ÇëÖØĞÂÊäÈë\n");
+            android_print("æ— æ•ˆè¾“å…¥ï¼Œè¯·é‡æ–°è¾“å…¥\n");
             continue;
         }
         }
 
-        // ¼ÓaiÄÄÖ»ÊÖ
-        android_print("ÄãÒª¼ÓaiµÄÄÄÖ»ÊÖ£¨ÊäÈëL»òR£©\n");
+        // åŠ aiå“ªåªæ‰‹
+        android_print("ä½ è¦åŠ aiçš„å“ªåªæ‰‹ï¼ˆè¾“å…¥Læˆ–Rï¼‰\n");
 
-        // »ñÈ¡ÓÃ»§ÊäÈë
+        // è·å–ç”¨æˆ·è¾“å…¥
         {
             unique_lock<mutex> lock(input_mutex);
             input_cv.wait(lock, [] { return !input_queue.empty(); });
@@ -149,208 +160,208 @@ void gameMain() {
         case 'L': {
             if (!LeftHandWin2) {
                 if (ChooseLeftHand) {
-                    android_print("ÄãÑ¡ÔñÁËaiµÄ×óÊÖ£¨" + to_string(LeftNum2) + ")\n");
+                    android_print("ä½ é€‰æ‹©äº†aiçš„å·¦æ‰‹ï¼ˆ" + to_string(LeftNum2) + ")\n");
                     LeftNum += LeftNum2;
                     if (LeftNum > 10) LeftNum -= 10;
-                    android_print("¼ÆËãÍê±Ï£¬´ËÊ±ÄãµÄ×óÊÖÊÇ£º" + to_string(LeftNum) + "\n");
+                    android_print("è®¡ç®—å®Œæ¯•ï¼Œæ­¤æ—¶ä½ çš„å·¦æ‰‹æ˜¯ï¼š" + to_string(LeftNum) + "\n");
                 }
                 else if (ChooseRightHand) {
-                    android_print("ÄãÑ¡ÔñÁËaiµÄ×óÊÖ£¨" + to_string(LeftNum2) + ")\n");
+                    android_print("ä½ é€‰æ‹©äº†aiçš„å·¦æ‰‹ï¼ˆ" + to_string(LeftNum2) + ")\n");
                     RightNum += LeftNum2;
                     if (RightNum > 10) RightNum -= 10;
-                    android_print("¼ÆËãÍê±Ï£¬´ËÊ±ÄãµÄÓÒÊÖÊÇ£º" + to_string(RightNum) + "\n");
+                    android_print("è®¡ç®—å®Œæ¯•ï¼Œæ­¤æ—¶ä½ çš„å³æ‰‹æ˜¯ï¼š" + to_string(RightNum) + "\n");
                 }
             }
             else {
-                android_print("AIµÄ×óÊÖÒÑ¾­»ñÊ¤£¬²»ÄÜÑ¡Ôñ\n");
+                android_print("AIçš„å·¦æ‰‹å·²ç»è·èƒœï¼Œä¸èƒ½é€‰æ‹©\n");
             }
             break;
         }
         case 'R': {
             if (!RightHandWin2) {
                 if (ChooseLeftHand) {
-                    android_print("ÄãÑ¡ÔñÁËaiµÄÓÒÊÖ£¨" + to_string(RightNum2) + ")\n");
+                    android_print("ä½ é€‰æ‹©äº†aiçš„å³æ‰‹ï¼ˆ" + to_string(RightNum2) + ")\n");
                     LeftNum += RightNum2;
                     if (LeftNum > 10) LeftNum -= 10;
-                    android_print("¼ÆËãÍê±Ï£¬´ËÊ±ÄãµÄ×óÊÖÊÇ£º" + to_string(LeftNum) + "\n");
+                    android_print("è®¡ç®—å®Œæ¯•ï¼Œæ­¤æ—¶ä½ çš„å·¦æ‰‹æ˜¯ï¼š" + to_string(LeftNum) + "\n");
                 }
                 else if (ChooseRightHand) {
-                    android_print("ÄãÑ¡ÔñÁËaiµÄÓÒÊÖ£¨" + to_string(RightNum2) + ")\n");
+                    android_print("ä½ é€‰æ‹©äº†aiçš„å³æ‰‹ï¼ˆ" + to_string(RightNum2) + ")\n");
                     RightNum += RightNum2;
                     if (RightNum > 10) RightNum -= 10;
-                    android_print("¼ÆËãÍê±Ï£¬´ËÊ±ÄãµÄÓÒÊÖÊÇ£º" + to_string(RightNum) + "\n");
+                    android_print("è®¡ç®—å®Œæ¯•ï¼Œæ­¤æ—¶ä½ çš„å³æ‰‹æ˜¯ï¼š" + to_string(RightNum) + "\n");
                 }
             }
             else {
-                android_print("AIµÄÓÒÊÖÒÑ¾­»ñÊ¤£¬²»ÄÜÑ¡Ôñ\n");
+                android_print("AIçš„å³æ‰‹å·²ç»è·èƒœï¼Œä¸èƒ½é€‰æ‹©\n");
             }
             break;
         }
         default: {
-            android_print("ÎŞĞ§ÊäÈë£¬ÇëÖØĞÂÊäÈë\n");
+            android_print("æ— æ•ˆè¾“å…¥ï¼Œè¯·é‡æ–°è¾“å…¥\n");
             continue;
         }
         }
 
-        // ÏÔÊ¾×óÓÒÊÖ
-        android_print("ÕâÊÇÄãµÄ×ó¡¢ÓÒÊÖ\n");
-        android_print("×ó£º" + to_string(LeftNum) + " ÓÒ£º" + to_string(RightNum) + "\n");
+        // æ˜¾ç¤ºå·¦å³æ‰‹
+        android_print("è¿™æ˜¯ä½ çš„å·¦ã€å³æ‰‹\n");
+        android_print("å·¦ï¼š" + to_string(LeftNum) + " å³ï¼š" + to_string(RightNum) + "\n");
 
-        android_print("ÕâÊÇaiµÄ×ó¡¢ÓÒÊÖ\n");
-        android_print("×ó£º" + to_string(LeftNum2) + " ÓÒ£º" + to_string(RightNum2) + "\n");
+        android_print("è¿™æ˜¯aiçš„å·¦ã€å³æ‰‹\n");
+        android_print("å·¦ï¼š" + to_string(LeftNum2) + " å³ï¼š" + to_string(RightNum2) + "\n");
 
-        // AI»ØºÏ
-        android_print("ai»ØºÏ\n");
+        // AIå›åˆ
+        android_print("aiå›åˆ\n");
         Sleep(2000);
 
         short RandomSelfHandChoice = dist(gen);
         short RandomHandChoice = dist(gen);
         bool aiActionTaken = false;
 
-        // AIÑ¡Ôñ×Ô¼ºµÄÊÖ
+        // AIé€‰æ‹©è‡ªå·±çš„æ‰‹
         if (RandomSelfHandChoice == 1 && !LeftHandWin2) {
-            android_print("aiÊ¹ÓÃÁË×óÊÖ£¨" + to_string(LeftNum2) + "£©\n");
+            android_print("aiä½¿ç”¨äº†å·¦æ‰‹ï¼ˆ" + to_string(LeftNum2) + "ï¼‰\n");
             Sleep(2000);
 
-            // AIÑ¡ÔñÍæ¼ÒµÄÊÖ
+            // AIé€‰æ‹©ç©å®¶çš„æ‰‹
             if (RandomHandChoice == 1 && !LeftHandWin) {
-                android_print("aiÑ¡ÔñÁËÄãµÄ×óÊÖ£¨" + to_string(LeftNum) + "£©\n");
+                android_print("aié€‰æ‹©äº†ä½ çš„å·¦æ‰‹ï¼ˆ" + to_string(LeftNum) + "ï¼‰\n");
                 LeftNum2 += LeftNum;
                 if (LeftNum2 > 10) LeftNum2 -= 10;
                 Sleep(2000);
-                android_print("ai´ËÊ±×óÊÖµÄÊı£º" + to_string(LeftNum2) + "\n");
+                android_print("aiæ­¤æ—¶å·¦æ‰‹çš„æ•°ï¼š" + to_string(LeftNum2) + "\n");
                 aiActionTaken = true;
             }
             else if (!RightHandWin) {
-                android_print("aiÑ¡ÔñÁËÄãµÄÓÒÊÖ£¨" + to_string(RightNum) + "£©\n");
+                android_print("aié€‰æ‹©äº†ä½ çš„å³æ‰‹ï¼ˆ" + to_string(RightNum) + "ï¼‰\n");
                 LeftNum2 += RightNum;
                 if (LeftNum2 > 10) LeftNum2 -= 10;
                 Sleep(2000);
-                android_print("ai´ËÊ±×óÊÖµÄÊı£º" + to_string(LeftNum2) + "\n");
+                android_print("aiæ­¤æ—¶å·¦æ‰‹çš„æ•°ï¼š" + to_string(LeftNum2) + "\n");
                 aiActionTaken = true;
             }
         }
         else if (RandomSelfHandChoice == 2 && !RightHandWin2) {
-            android_print("aiÊ¹ÓÃÁËÓÒÊÖ£¨" + to_string(RightNum2) + "£©\n");
+            android_print("aiä½¿ç”¨äº†å³æ‰‹ï¼ˆ" + to_string(RightNum2) + "ï¼‰\n");
             Sleep(2000);
 
-            // AIÑ¡ÔñÍæ¼ÒµÄÊÖ
+            // AIé€‰æ‹©ç©å®¶çš„æ‰‹
             if (RandomHandChoice == 1 && !LeftHandWin) {
-                android_print("aiÑ¡ÔñÁËÄãµÄ×óÊÖ£¨" + to_string(LeftNum) + "£©\n");
+                android_print("aié€‰æ‹©äº†ä½ çš„å·¦æ‰‹ï¼ˆ" + to_string(LeftNum) + "ï¼‰\n");
                 RightNum2 += LeftNum;
                 if (RightNum2 > 10) RightNum2 -= 10;
                 Sleep(2000);
-                android_print("ai´ËÊ±ÓÒÊÖµÄÊı£º" + to_string(RightNum2) + "\n");
+                android_print("aiæ­¤æ—¶å³æ‰‹çš„æ•°ï¼š" + to_string(RightNum2) + "\n");
                 aiActionTaken = true;
             }
             else if (!RightHandWin) {
-                android_print("aiÑ¡ÔñÁËÄãµÄÓÒÊÖ£¨" + to_string(RightNum) + "£©\n");
+                android_print("aié€‰æ‹©äº†ä½ çš„å³æ‰‹ï¼ˆ" + to_string(RightNum) + "ï¼‰\n");
                 RightNum2 += RightNum;
                 if (RightNum2 > 10) RightNum2 -= 10;
                 Sleep(2000);
-                android_print("ai´ËÊ±ÓÒÊÖµÄÊı£º" + to_string(RightNum2) + "\n");
+                android_print("aiæ­¤æ—¶å³æ‰‹çš„æ•°ï¼š" + to_string(RightNum2) + "\n");
                 aiActionTaken = true;
             }
         }
 
-        // Èç¹ûAIÃ»ÓĞÖ´ĞĞ¶¯×÷£¬³¢ÊÔÁíÒ»Ö»ÊÖ
+        // å¦‚æœAIæ²¡æœ‰æ‰§è¡ŒåŠ¨ä½œï¼Œå°è¯•å¦ä¸€åªæ‰‹
         if (!aiActionTaken) {
             if (RandomSelfHandChoice == 1 && !RightHandWin2) {
-                android_print("ai¸ÄÓÃÁËÓÒÊÖ£¨" + to_string(RightNum2) + "£©\n");
+                android_print("aiæ”¹ç”¨äº†å³æ‰‹ï¼ˆ" + to_string(RightNum2) + "ï¼‰\n");
                 Sleep(2000);
 
                 if (RandomHandChoice == 1 && !LeftHandWin) {
-                    android_print("aiÑ¡ÔñÁËÄãµÄ×óÊÖ£¨" + to_string(LeftNum) + "£©\n");
+                    android_print("aié€‰æ‹©äº†ä½ çš„å·¦æ‰‹ï¼ˆ" + to_string(LeftNum) + "ï¼‰\n");
                     RightNum2 += LeftNum;
                     if (RightNum2 > 10) RightNum2 -= 10;
                     Sleep(2000);
-                    android_print("ai´ËÊ±ÓÒÊÖµÄÊı£º" + to_string(RightNum2) + "\n");
+                    android_print("aiæ­¤æ—¶å³æ‰‹çš„æ•°ï¼š" + to_string(RightNum2) + "\n");
                 }
                 else if (!RightHandWin) {
-                    android_print("aiÑ¡ÔñÁËÄãµÄÓÒÊÖ£¨" + to_string(RightNum) + "£©\n");
+                    android_print("aié€‰æ‹©äº†ä½ çš„å³æ‰‹ï¼ˆ" + to_string(RightNum) + "ï¼‰\n");
                     RightNum2 += RightNum;
                     if (RightNum2 > 10) RightNum2 -= 10;
                     Sleep(2000);
-                    android_print("ai´ËÊ±ÓÒÊÖµÄÊı£º" + to_string(RightNum2) + "\n");
+                    android_print("aiæ­¤æ—¶å³æ‰‹çš„æ•°ï¼š" + to_string(RightNum2) + "\n");
                 }
             }
             else if (RandomSelfHandChoice == 2 && !LeftHandWin2) {
-                android_print("ai¸ÄÓÃÁË×óÊÖ£¨" + to_string(LeftNum2) + "£©\n");
+                android_print("aiæ”¹ç”¨äº†å·¦æ‰‹ï¼ˆ" + to_string(LeftNum2) + "ï¼‰\n");
                 Sleep(2000);
 
                 if (RandomHandChoice == 1 && !LeftHandWin) {
-                    android_print("aiÑ¡ÔñÁËÄãµÄ×óÊÖ£¨" + to_string(LeftNum) + "£©\n");
+                    android_print("aié€‰æ‹©äº†ä½ çš„å·¦æ‰‹ï¼ˆ" + to_string(LeftNum) + "ï¼‰\n");
                     LeftNum2 += LeftNum;
                     if (LeftNum2 > 10) LeftNum2 -= 10;
                     Sleep(2000);
-                    android_print("ai´ËÊ±×óÊÖµÄÊı£º" + to_string(LeftNum2) + "\n");
+                    android_print("aiæ­¤æ—¶å·¦æ‰‹çš„æ•°ï¼š" + to_string(LeftNum2) + "\n");
                 }
                 else if (!RightHandWin) {
-                    android_print("aiÑ¡ÔñÁËÄãµÄÓÒÊÖ£¨" + to_string(RightNum) + "£©\n");
+                    android_print("aié€‰æ‹©äº†ä½ çš„å³æ‰‹ï¼ˆ" + to_string(RightNum) + "ï¼‰\n");
                     LeftNum2 += RightNum;
                     if (LeftNum2 > 10) LeftNum2 -= 10;
                     Sleep(2000);
-                    android_print("ai´ËÊ±×óÊÖµÄÊı£º" + to_string(LeftNum2) + "\n");
+                    android_print("aiæ­¤æ—¶å·¦æ‰‹çš„æ•°ï¼š" + to_string(LeftNum2) + "\n");
                 }
             }
         }
 
-        // ÏÔÊ¾×óÓÒÊÖ
-        android_print("ÕâÊÇÄãµÄ×ó¡¢ÓÒÊÖ\n");
-        android_print("×ó£º" + to_string(LeftNum) + " ÓÒ£º" + to_string(RightNum) + "\n");
+        // æ˜¾ç¤ºå·¦å³æ‰‹
+        android_print("è¿™æ˜¯ä½ çš„å·¦ã€å³æ‰‹\n");
+        android_print("å·¦ï¼š" + to_string(LeftNum) + " å³ï¼š" + to_string(RightNum) + "\n");
 
-        android_print("ÕâÊÇaiµÄ×ó¡¢ÓÒÊÖ\n");
-        android_print("×ó£º" + to_string(LeftNum2) + " ÓÒ£º" + to_string(RightNum2) + "\n");
+        android_print("è¿™æ˜¯aiçš„å·¦ã€å³æ‰‹\n");
+        android_print("å·¦ï¼š" + to_string(LeftNum2) + " å³ï¼š" + to_string(RightNum2) + "\n");
 
-        // »ñÊ¤Ìõ¼ş
+        // è·èƒœæ¡ä»¶
         if (LeftNum == 10 && !LeftHandWin) {
             LeftHandWin = true;
-            android_print("ÄãµÄ×óÊÖÒÑ»ñÊ¤£¬½«²»¿ÉÓÃ\n");
+            android_print("ä½ çš„å·¦æ‰‹å·²è·èƒœï¼Œå°†ä¸å¯ç”¨\n");
             if (RightHandWin) {
-                android_print("ÄãÒÑ»ñÊ¤£¡\n");
+                android_print("ä½ å·²è·èƒœï¼\n");
                 return;
             }
         }
 
         if (RightNum == 10 && !RightHandWin) {
             RightHandWin = true;
-            android_print("ÄãµÄÓÒÊÖÒÑ»ñÊ¤£¬½«²»¿ÉÓÃ\n");
+            android_print("ä½ çš„å³æ‰‹å·²è·èƒœï¼Œå°†ä¸å¯ç”¨\n");
             if (LeftHandWin) {
-                android_print("ÄãÒÑ»ñÊ¤£¡\n");
+                android_print("ä½ å·²è·èƒœï¼\n");
                 return;
             }
         }
 
         if (LeftNum2 == 10 && !LeftHandWin2) {
             LeftHandWin2 = true;
-            android_print("aiµÄ×óÊÖÒÑ»ñÊ¤£¬½«²»¿ÉÓÃ\n");
+            android_print("aiçš„å·¦æ‰‹å·²è·èƒœï¼Œå°†ä¸å¯ç”¨\n");
             if (RightHandWin2) {
-                android_print("ÄãÊäÁË£¡\n");
+                android_print("ä½ è¾“äº†ï¼\n");
                 return;
             }
         }
 
         if (RightNum2 == 10 && !RightHandWin2) {
             RightHandWin2 = true;
-            android_print("aiµÄÓÒÊÖÒÑ»ñÊ¤£¬½«²»¿ÉÓÃ\n");
+            android_print("aiçš„å³æ‰‹å·²è·èƒœï¼Œå°†ä¸å¯ç”¨\n");
             if (LeftHandWin2) {
-                android_print("ÄãÊäÁË£¡\n");
+                android_print("ä½ è¾“äº†ï¼\n");
                 return;
             }
         }
     }
 }
 
-// JNI º¯Êı
+// JNI å‡½æ•°
 extern "C" JNIEXPORT void JNICALL
 Java_com_uniaball_project1_1android_GameActivity_startGame(
     JNIEnv* env,
     jobject /* this */) {
-    // ÖØ¶¨ÏòÊä³ö
+    // é‡å®šå‘è¾“å‡º
     static AndroidStream androidStream;
     cout.rdbuf(&androidStream);
 
-    // Æô¶¯ÓÎÏ·Ïß³Ì
+    // å¯åŠ¨æ¸¸æˆçº¿ç¨‹
     thread game_thread([] {
         gameMain();
         });
@@ -384,6 +395,6 @@ Java_com_uniaball_project1_1android_GameActivity_stopGame(
     JNIEnv* env,
     jobject /* this */) {
     game_running = false;
-    // »½ĞÑÈÎºÎµÈ´ıÊäÈëµÄÏß³Ì
+    // å”¤é†’ä»»ä½•ç­‰å¾…è¾“å…¥çš„çº¿ç¨‹
     input_cv.notify_all();
 }
