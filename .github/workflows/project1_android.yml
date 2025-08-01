@@ -16,6 +16,11 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@main
+      with:
+         allow-snapshot-wrappers: true
         
     - name: Build Android APK
       working-directory: main-repo/projects/project1_android
