@@ -1,31 +1,32 @@
+// 在 plugins 块之前添加必要的构建脚本依赖
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:7.3.1"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.0"
+    }
+}
+
+// 应用插件配置
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android' version '1.8.0' apply false
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
     namespace 'com.uniaball.project1_android'
-    compileSdkVersion 34
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.uniaball.project1_android"
-        minSdkVersion 24
-        targetSdkVersion 34
+        minSdk 24
+        targetSdk 33
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        
-        externalNativeBuild {
-            cmake {
-                cppFlags "-std=c++17"
-                arguments "-DANDROID_STL=c++_shared"
-            }
-        }
-        
-        ndk {
-            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
-        }
     }
 
     buildTypes {
@@ -34,42 +35,34 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
-    
     kotlinOptions {
-        jvmTarget = '11'
+        jvmTarget = '17'
     }
     
-    buildFeatures {
-        viewBinding true
-    }
-    
+    // NDK配置
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
-            version "3.22.1"
+            version "3.18.1"
         }
-    }
-    
-    packagingOptions {
-        pickFirst 'lib/*/libc++_shared.so'
     }
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.12.0'
+    // Android核心库
+    implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.google.android.material:material:1.9.0'
     
-    // Termux �ն���ͼ����
+    // Termux终端库
     implementation 'com.termux:terminal-view:0.118.0'
     implementation 'com.termux:terminal-emulator:0.118.0'
     
+    // 测试依赖
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
