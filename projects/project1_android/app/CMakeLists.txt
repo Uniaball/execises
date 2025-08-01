@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.22.1)
 # 设置项目名称
 project("project1_android")
 
+# 设置编码选项
+add_compile_options(-U_CRT_STDIO_ISO_WIDE_SPECIFIERS)
+add_compile_options(-Wno-invalid-source-encoding)
+
 # 创建共享库
 add_library(
         project1_android
