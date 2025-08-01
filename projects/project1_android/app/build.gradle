@@ -19,8 +19,11 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true // 启用R8
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
         }
     }
     
@@ -46,6 +49,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     
+    // Termux 库
     implementation 'com.termux:terminal-view:0.106.0'
     implementation 'com.termux:terminal-emulator:0.106.0'
     
