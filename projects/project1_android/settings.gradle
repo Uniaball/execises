@@ -1,23 +1,29 @@
 pluginManagement {
     repositories {
+        gradlePluginPortal()
         google()
         mavenCentral()
-        gradlePluginPortal()
     }
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id == 'com.android.application') {
                 useModule("com.android.tools.build:gradle:7.3.1")
             }
+            if (requested.id.id == 'org.jetbrains.kotlin.android') {
+                useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
+            }
         }
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 }
+
 rootProject.name = "UniballProject"
 include ':app'
