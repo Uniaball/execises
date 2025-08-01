@@ -1,34 +1,34 @@
-cmake_minimum_required(VERSION 3.18.1)
+cmake_minimum_required(VERSION 3.22.1)
 
-# ÉèÖÃÏîÄ¿Ãû³Æ
-project("project1-android")
+# è®¾ç½®é¡¹ç›®åç§°
+project("project1_android")
 
-# ´´½¨¹²Ïí¿â
+# åˆ›å»ºå…±äº«åº“
 add_library(
-        uniball-game
+        project1_android
         SHARED
         src/main/cpp/main.cpp
 )
 
-# Ìí¼ÓJNIÍ·ÎÄ¼şÂ·¾¶
+# æ·»åŠ JNIå¤´æ–‡ä»¶è·¯å¾„
 find_library(log-lib log)
 target_include_directories(
-        project1-android 
+        project1_android 
         PRIVATE ${CMAKE_SOURCE_DIR}/src/main/cpp
         PRIVATE ${ANDROID_NDK}/sources/android/native_app_glue
 )
 
-# Á´½ÓÒÀÀµ¿â
+# é“¾æ¥ä¾èµ–åº“
 target_link_libraries(
-        project1-android
+        project1_android
         android
         log
         ${log-lib}
 )
 
-# ÅäÖÃC++±ê×¼
+# é…ç½®C++æ ‡å‡†
 set_target_properties(
-        project1-android
+        project1_android
         PROPERTIES 
         CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
