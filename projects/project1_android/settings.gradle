@@ -3,7 +3,6 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
-        jcenter() // 明确添加JCenter仓库
     }
 }
 
@@ -12,8 +11,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        jcenter() // 添加JCenter仓库
-        maven { url 'https://jitpack.io' } // 保留JitPack作为备用
+        // 添加 Maven Central 的特定仓库
+        maven {
+            url "https://repo1.maven.org/maven2/"
+        }
     }
 }
 
