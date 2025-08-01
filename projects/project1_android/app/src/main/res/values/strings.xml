@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name">Uniball Game</string>
     <string name="game_title">Uniball Terminal Game</string>
     <string name="input_hint">Enter command...</string>
     <string name="submit_button">Submit</string>
