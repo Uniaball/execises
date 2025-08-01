@@ -1,6 +1,7 @@
 name: Android CI-project1
 
-on: [push]
+on:
+   workflow_dispatch:
 
 jobs:
   build:
