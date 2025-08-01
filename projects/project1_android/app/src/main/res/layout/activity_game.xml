@@ -8,6 +8,7 @@
     android:padding="16dp"
     tools:context=".GameActivity">
 
+    <!-- 游戏标题 -->
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="match_parent"
@@ -17,6 +18,7 @@
         android:gravity="center"
         android:padding="16dp"/>
 
+    <!-- 终端视图 -->
     <com.termux.view.TerminalView
         android:id="@+id/terminal_view"
         android:layout_width="match_parent"
@@ -24,11 +26,9 @@
         android:layout_weight="1"
         android:background="@android:color/black"
         android:textColor="@android:color/white"
-        android:padding="8dp"
-        app:cursorBlink="true"
-        app:textSize="12sp"
-        app:terminalMargin="4"/>
+        android:padding="8dp"/>
 
+    <!-- 输入区域 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
