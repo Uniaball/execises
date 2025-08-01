@@ -3,16 +3,7 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
-    }
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == 'com.android.application') {
-                useModule("com.android.tools.build:gradle:7.3.1")
-            }
-            if (requested.id.id == 'org.jetbrains.kotlin.android') {
-                useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
-            }
-        }
+        jcenter() // 明确添加JCenter仓库
     }
 }
 
@@ -21,7 +12,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
+        jcenter() // 添加JCenter仓库
+        maven { url 'https://jitpack.io' } // 保留JitPack作为备用
     }
 }
 
