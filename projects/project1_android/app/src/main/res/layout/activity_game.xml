@@ -5,49 +5,49 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="16dp"
     tools:context=".GameActivity">
 
-	<TextView
+    <TextView
         android:id="@+id/titleTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/game_title"
-        android:textSize="24sp"
-        android:textStyle="bold"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:gravity="center"
         android:padding="16dp"/>
 
-	<com.termux.view.TerminalView
+    <com.termux.view.TerminalView
         android:id="@+id/terminal_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="@android:color/black"
+        android:textColor="@android:color/white"
         android:padding="8dp"
-        android:background="#FF1E1E1E"
-        android:textColor="#FFCCCCCC"
-        app:textSize="14sp"/>
+        app:cursorBlink="true"
+        app:textSize="12sp"
+        app:terminalMargin="4"/>
 
-	<LinearLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="8dp">
 
-		<EditText
+        <EditText
             android:id="@+id/inputEditText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/input_hint"
-            android:singleLine="true"
-            android:imeOptions="actionDone"/>
+            android:imeOptions="actionSend"
+            android:inputType="text"/>
 
-		<Button
+        <Button
             android:id="@+id/submitButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/submit_button"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"/>
-	</LinearLayout>
+            android:text="@string/submit_button"/>
+    </LinearLayout>
 </LinearLayout>
