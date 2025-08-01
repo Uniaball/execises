@@ -3,110 +3,104 @@ package com.uniaball.project1_android;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import com.termux.view.TerminalView;
-import com.termux.terminal.TerminalSession;
-import com.termux.terminal.TerminalBuffer;
 
-public class GameActivity extends AppCompatActivity implements TerminalBridge.OutputListener {
+public class GameActivity extends AppCompatActivity {
+
     private TerminalView terminalView;
-    private TerminalBridge terminalBridge;
+    private EditText inputEditText;
+    private Button submitButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         
-        // ≥ı ºªØ÷’∂À ”Õº
+        // ÂàùÂßãÂåñËßÜÂõæ
         terminalView = findViewById(R.id.terminal_view);
-        terminalView.setTextSize(14);
-        terminalView.setEmitCtrlKeyOnVolumeDown(false);
+        inputEditText = findViewById(R.id.inputEditText);
+        submitButton = findViewById(R.id.submitButton);
         
-        // ≥ı ºªØ÷’∂À«≈Ω”
-        terminalBridge = new TerminalBridge();
-        terminalBridge.setOutputListener(this);
+        // ËÆæÁΩÆÁªàÁ´ØÂ±ûÊÄß
+        configureTerminalView();
         
-        // …Ë÷√º¸≈Ã ‰»Îº‡Ã˝
+        // ËÆæÁΩÆËæìÂÖ•ÁõëÂê¨
+        setupInputListeners();
+        
+        // ÂêØÂä®Ê∏∏Êàè
+        startGame();
+    }
+
+    private void configureTerminalView() {
+        // ËÆæÁΩÆÁªàÁ´ØËßÜÂõæÂ±ûÊÄß
+        terminalView.setTextSize(12); // 12sp
+        terminalView.setTerminalMargin(4); // 4px
+        terminalView.setCursorBlink(true);
+        terminalView.setBackgroundColor(getResources().getColor(android.R.color.black));
+        terminalView.setTextColor(getResources().getColor(android.R.color.white));
+    }
+
+    private void setupInputListeners() {
+        // ÈîÆÁõòËæìÂÖ•ÁõëÂê¨
         terminalView.setOnKeyListener((view, keyCode, event) -> {
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                handleKeyEvent(keyCode, event);
+                if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                    sendUserInput();
+                    return true;
+                }
             }
-            return true;
+            return false;
         });
         
-        // ∆Ù∂Ø”Œœ∑
-        terminalBridge.startGame();
-        terminalView.append("\n”Œœ∑“—∆Ù∂Ø! «Îø™ º”Œœ∑...\n");
+        // ËæìÂÖ•Ê°ÜÁõëÂê¨
+        inputEditText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEND) {
+                sendUserInput();
+                return true;
+            }
+            return false;
+        });
+        
+        // Êèê‰∫§ÊåâÈíÆÁõëÂê¨
+        submitButton.setOnClickListener(v -> sendUserInput());
+    }
+
+    private void sendUserInput() {
+        String input = inputEditText.getText().toString().trim();
+        if (!input.isEmpty()) {
+            // ÂèëÈÄÅÂà∞ÂéüÁîü‰ª£Á†Å
+            TerminalBridge.sendInput(input);
+            // Ê∏ÖÁ©∫ËæìÂÖ•Ê°Ü
+            inputEditText.setText("");
+        }
+    }
+
+    private void startGame() {
+        // ËÆæÁΩÆËæìÂá∫ÁõëÂê¨Âô®
+        TerminalBridge.setOutputListener(this::handleOutput);
+        
+        // ÂêØÂä®Ê∏∏ÊàèÁ∫øÁ®ã
+        new Thread(() -> {
+            TerminalBridge.startGame();
+        }).start();
+    }
+
+    private void handleOutput(String text) {
+        runOnUiThread(() -> {
+            terminalView.append(text);
+            // Ëá™Âä®ÊªöÂä®Âà∞Â∫ïÈÉ®
+            terminalView.scrollToEnd();
+        });
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        terminalBridge.stopGame();
-    }
-
-    @Override
-    public void onOutput(String text) {
-        runOnUiThread(() -> {
-            terminalView.append(text);
-        });
-    }
-
-    private void handleKeyEvent(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_ENTER:
-            case KeyEvent.KEYCODE_NUMPAD_ENTER:
-                handleSubmit();
-                break;
-            case KeyEvent.KEYCODE_DEL:
-                handleBackspace();
-                break;
-            default:
-                char inputChar = (char) event.getUnicodeChar();
-                handleCharacter(inputChar);
-                break;
-        }
-    }
-
-    private void handleCharacter(char c) {
-        TerminalBuffer buffer = terminalView.getCurrentTerminalBuffer();
-        buffer.setChar(buffer.getCursorX(), buffer.getCursorY(), c);
-        buffer.setCursorX(buffer.getCursorX() + 1);
-        terminalView.invalidate();
-    }
-
-    private void handleBackspace() {
-        TerminalBuffer buffer = terminalView.getCurrentTerminalBuffer();
-        if (buffer.getCursorX() > 0) {
-            buffer.setCursorX(buffer.getCursorX() - 1);
-            buffer.setChar(buffer.getCursorX(), buffer.getCursorY(), ' ');
-            terminalView.invalidate();
-        }
-    }
-
-    private void handleSubmit() {
-        TerminalBuffer buffer = terminalView.getCurrentTerminalBuffer();
-        StringBuilder inputBuilder = new StringBuilder();
-        
-        // ªÒ»°µ±«∞–– ‰»Î
-        int cursorY = buffer.getCursorY();
-        for (int i = 0; i < buffer.getCursorX(); i++) {
-            char c = buffer.getChar(i, cursorY);
-            if (c != 0) {
-                inputBuilder.append(c);
-            }
-        }
-        
-        String input = inputBuilder.toString().trim();
-        if (!input.isEmpty()) {
-            // ∑¢ÀÕ ‰»ÎµΩ”Œœ∑¬ﬂº≠
-            terminalBridge.sendInput(input);
-        }
-        
-        // «Âø’ ‰»Î––
-        for (int i = 0; i < buffer.getCursorX(); i++) {
-            buffer.setChar(i, cursorY, ' ');
-        }
-        buffer.setCursorX(0);
-        terminalView.invalidate();
+        // ÂÅúÊ≠¢Ê∏∏ÊàèÂπ∂Ê∏ÖÁêÜËµÑÊ∫ê
+        TerminalBridge.stopGame();
     }
 }
