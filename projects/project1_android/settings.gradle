@@ -12,9 +12,6 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         // 添加 Maven Central 的特定仓库
-        maven {
-            url "https://repo1.maven.org/maven2/"
-        }
     }
 }
 
